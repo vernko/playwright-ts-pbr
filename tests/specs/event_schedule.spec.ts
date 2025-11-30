@@ -18,3 +18,17 @@ test('a user can view event details', async ({ page }) => {
     const eventPageHeadingText = await eventPageHeading.textContent()
     expect(eventPageHeadingText).toBe(eventTitle);
 })
+
+test('a user can get general tickets', async ({ page }) => {
+    const cards = await page.locator('.eventScheduleItem')
+    const firstCard = await cards.filter({ has: page.getByRole('link', { name: 'General Tickets' })}).first()
+    const [newTab] = await Promise.all([
+        page.waitForEvent('popup'),
+        firstCard.getByRole('link', { name: 'General Tickets' }).click()
+    ]);
+
+    // using this because the ticket vendor seems to be different depending on the type of event
+    const newUrl = newTab.url()
+    expect(newUrl).toBeTruthy()
+    expect(newUrl).not.toBe('about:blank')
+})
