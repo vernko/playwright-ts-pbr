@@ -32,3 +32,21 @@ test('a user can get general tickets', async ({ page }) => {
     expect(newUrl).toBeTruthy()
     expect(newUrl).not.toBe('about:blank')
 })
+
+test('a user can filter events', async ({ page }) => {
+    const filterValue = 'UTB'
+    await page.locator('#eventTourSelect.form-select').selectOption(filterValue)
+    await expect(page.locator(`.eventScheduleItem.${filterValue}`).first()).toBeVisible();
+
+    const allItems = await page.locator('.eventScheduleItem')
+    const allItemsCount = await allItems.count()
+
+    const matchingItems = await page.locator(`.eventScheduleItem.${filterValue}`);
+    const matchingItemsCount = await matchingItems.count()
+
+    const visibleItems = allItems.filter({ visible: true });
+    const hiddenItems  = allItems.filter({ visible: false });
+
+    await expect(visibleItems).toHaveCount(matchingItemsCount);
+    await expect(hiddenItems).toHaveCount((allItemsCount) - (matchingItemsCount));
+})
