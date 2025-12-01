@@ -6,6 +6,24 @@ test.beforeEach(async ({ page }) => {
     await page.getByRole('link', { name: 'Event Schedule'}).click()
 })
 
+test('a user can filter events', async ({ page }) => {
+    const filterValue = 'UTB'
+    await page.locator('#eventTourSelect.form-select').selectOption(filterValue)
+    await expect(page.locator(`.eventScheduleItem.${filterValue}`).first()).toBeVisible();
+
+    const allItems = await page.locator('.eventScheduleItem')
+    const allItemsCount = await allItems.count()
+
+    const matchingItems = await page.locator(`.eventScheduleItem.${filterValue}`);
+    const matchingItemsCount = await matchingItems.count()
+
+    const visibleItems = allItems.filter({ visible: true });
+    const hiddenItems  = allItems.filter({ visible: false });
+
+    await expect(visibleItems).toHaveCount(matchingItemsCount);
+    await expect(hiddenItems).toHaveCount((allItemsCount) - (matchingItemsCount));
+})
+
 test('a user can view event details', async ({ page }) => {
     const cards = await page.locator('.eventScheduleItem')
     const firstCard = await cards.filter({ has: page.getByRole('link', { name: 'Event Details' })}).first();
@@ -33,20 +51,11 @@ test('a user can get general tickets', async ({ page }) => {
     expect(newUrl).not.toBe('about:blank')
 })
 
-test('a user can filter events', async ({ page }) => {
-    const filterValue = 'UTB'
-    await page.locator('#eventTourSelect.form-select').selectOption(filterValue)
-    await expect(page.locator(`.eventScheduleItem.${filterValue}`).first()).toBeVisible();
+test('a user can get premium tickets', async ({ page }) => {
+    const cards = await page.locator('.eventScheduleItem')
+    const firstPremiumCard = await cards.filter({ has: page.getByRole('link', { name: 'Premium Tickets' })}).first()
+    await firstPremiumCard.getByRole('link', { name: 'Premium Tickets' }).click()
 
-    const allItems = await page.locator('.eventScheduleItem')
-    const allItemsCount = await allItems.count()
-
-    const matchingItems = await page.locator(`.eventScheduleItem.${filterValue}`);
-    const matchingItemsCount = await matchingItems.count()
-
-    const visibleItems = allItems.filter({ visible: true });
-    const hiddenItems  = allItems.filter({ visible: false });
-
-    await expect(visibleItems).toHaveCount(matchingItemsCount);
-    await expect(hiddenItems).toHaveCount((allItemsCount) - (matchingItemsCount));
+    const activeTab = page.locator('.tab-pane.active');
+    await expect(activeTab.getByRole('link', { name: 'Contact Us' })).toBeVisible();
 })
