@@ -1,9 +1,9 @@
 Feature: Filtering
 
-Scenario: Selecting a filter only displays standings related to the filter
+Scenario: Selecting a tab only displays standings related to the tab
     Given user is on the MVP race page
-    When the user selects a filter
-    Then only standings related to that filter are displayed
+    When the user selects a tab
+    Then only standings related to that tab are displayed
 
     Examples:
-    | Regular Season | Championship |
+    | Regular Season | Championship | 2024
