@@ -32,12 +32,7 @@ test('a user can view standings in the all around standings', async ({ page }) =
 
     await openResultsPage(page, dropDownValue)
 
-    const cardLink = page
-    .locator('p.card-text', { hasText: leaderboardValue })
-    .locator('xpath=ancestor::a')
-
-    await expect(cardLink).toBeAttached()
-    await cardLink.scrollIntoViewIfNeeded()
+    const cardLink = page.locator(`a:has(h4.font-Fixture:has-text("${leaderboardValue}"))`)
     await expect(cardLink).toBeVisible()
     await cardLink.click()
 
