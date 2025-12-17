@@ -18,7 +18,7 @@ Scenario: Selecting a stat displays the stats for that tab
     Examples:
     | Career | Season
 
-Feature: Filter year tab
+Feature: Season filter year tab
 
 Scenario: Selecting a year displays the stats for that tab
     Given user has selected the season tab on the Athlete's page
