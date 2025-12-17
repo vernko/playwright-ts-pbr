@@ -74,18 +74,17 @@ test('a user can filter events', async ({ page }) => {
 
 test('a user can view event details', async ({ page }) => {
   const text = 'Event Details';
-  const firstCard = await getFirstCard(page, text);
-  const eventTitle = await firstCard.locator('h2').textContent();
+  const firstCard = await getFirstCard(page, text)
+  const eventTitle = await firstCard.locator('h2').textContent()
   
-  // FIX 3: Simplified navigation wait
   await firstCard.locator('a', { hasText: text }).click()
   
   // Wait for the specific element with longer timeout
-  const eventPageHeading = page.locator('.col-12.col-md-8 h2').first();
-  await expect(eventPageHeading).toBeVisible({ timeout: 10000 });
+  const eventPageHeading = page.locator('h2', { hasText: eventTitle || '' })
+  await expect(eventPageHeading).toBeVisible({ timeout: 10000 })
   
-  const eventPageHeadingText = await eventPageHeading.textContent();
-  expect(eventPageHeadingText).toBe(eventTitle);
+  const eventPageHeadingText = await eventPageHeading.textContent()
+  expect(eventPageHeadingText).toBe(eventTitle)
 })
 
 test('a user can get general tickets', async ({ page }) => {
