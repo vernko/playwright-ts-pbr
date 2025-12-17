@@ -33,9 +33,9 @@ async function countVisible(locator: Locator) {
 }
 
 async function getFirstCard(page: Page, text: string) {
-  const firstCard = await page.locator('.eventScheduleItem').filter({hasText: text }).first()
-  await firstCard.scrollIntoViewIfNeeded()
-  await expect(firstCard).toBeVisible()
+  const firstCard = page.locator('.eventScheduleItem').filter({hasText: text }).first()
+  await expect(firstCard).toBeVisible({ timeout: 15000 })
+  await firstCard.scrollIntoViewIfNeeded({ timeout: 10000 })
   return firstCard;
 }
 
@@ -48,23 +48,20 @@ test.beforeEach(async ({ page }) => {
 test('a user can filter events', async ({ page }) => {
   const filterValue = 'UTB'
   
-  // Count items before filtering
-  const nonMatchingItems = page.locator(`.eventScheduleItem:not(.${filterValue})`)
-  const totalNonMatching = await nonMatchingItems.count()
-  
   await page.locator('#eventTourSelect.form-select').selectOption(filterValue)
   
   // Wait for matching items to be visible
   const matchingItems = page.locator(`.eventScheduleItem.${filterValue}`)
   await expect(matchingItems.first()).toBeVisible()
   
-  // Wait for the non-matching items to be filtered out by checking CSS
+  // Wait for the non-matching items to be filtered out
+  const nonMatchingItems = page.locator(`.eventScheduleItem:not(.${filterValue})`)
   await expect(async () => {
     const visible = await countVisible(nonMatchingItems)
     expect(visible).toBe(0)
-  }).toPass({ timeout: 10000, intervals: [200] }) // Fixed typo: was 100000
+  }).toPass({ timeout: 10000, intervals: [200] })
   
-  // Now verify all the counts
+  const totalNonMatching = await nonMatchingItems.count()
   const matchingHidden = await countHidden(matchingItems)
   const nonMatchingVisible = await countVisible(nonMatchingItems)
   const nonMatchingHidden = await countHidden(nonMatchingItems)
@@ -72,7 +69,7 @@ test('a user can filter events', async ({ page }) => {
   expect(matchingHidden).toBe(0)
   expect(nonMatchingVisible).toBe(0)
   expect(nonMatchingHidden).toBe(totalNonMatching)
-  expect(totalNonMatching).toBeGreaterThan(0) // Sanity check
+  expect(totalNonMatching).toBeGreaterThan(0)
 })
 
 test('a user can view event details', async ({ page }) => {
@@ -80,6 +77,7 @@ test('a user can view event details', async ({ page }) => {
   const firstCard = await getFirstCard(page, text);
   const eventTitle = await firstCard.locator('h2').textContent();
   
+  // FIX 3: Simplified navigation wait
   await firstCard.locator('a', { hasText: text }).click()
   
   // Wait for the specific element with longer timeout
@@ -120,21 +118,9 @@ test('a user can get premium tickets', async ({ page }) => {
   const text = 'Premium Tickets'
   const firstPremiumCard = await getFirstCard(page, text)
   
-  // Wait for new page to open, with timeout
-  const [newPage] = await Promise.all([
-    page.context().waitForEvent('page', { timeout: 5000 }).catch(() => null),
-    firstPremiumCard.locator('a', { hasText: text }).click()
-  ])
+  await firstPremiumCard.locator('a', { hasText: text }).click()
   
-  // If a new page opened, use it
-  if (newPage) {
-    await newPage.waitForLoadState('domcontentloaded')
-    const activeTab = newPage.locator('.tab-pane.active')
-    await expect(activeTab.getByRole('link', { name: 'Contact Us' })).toBeVisible({ timeout: 10000 })
-    await newPage.close()
-  } else {
-    // Otherwise check the original page
-    const activeTab = page.locator('.tab-pane.active')
-    await expect(activeTab.getByRole('link', { name: 'Contact Us' })).toBeVisible({ timeout: 10000 })
-  }
+  // Wait for the active tab content to load
+  const activeTab = page.locator('.tab-pane.active')
+  await expect(activeTab.getByRole('link', { name: 'Contact Us' })).toBeVisible({ timeout: 10000 })
 })
