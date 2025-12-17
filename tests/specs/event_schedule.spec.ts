@@ -50,11 +50,9 @@ test('a user can filter events', async ({ page }) => {
   
   await page.locator('#eventTourSelect.form-select').selectOption(filterValue)
   
-  // Wait for matching items to be visible
   const matchingItems = page.locator(`.eventScheduleItem.${filterValue}`)
   await expect(matchingItems.first()).toBeVisible()
   
-  // Wait for the non-matching items to be filtered out
   const nonMatchingItems = page.locator(`.eventScheduleItem:not(.${filterValue})`)
   await expect(async () => {
     const visible = await countVisible(nonMatchingItems)
@@ -79,7 +77,6 @@ test('a user can view event details', async ({ page }) => {
   
   await firstCard.locator('a', { hasText: text }).click()
   
-  // Wait for the specific element with longer timeout
   const eventPageHeading = page.locator('h2', { hasText: eventTitle || '' })
   await expect(eventPageHeading).toBeVisible({ timeout: 10000 })
   
@@ -119,7 +116,6 @@ test('a user can get premium tickets', async ({ page }) => {
   
   await firstPremiumCard.locator('a', { hasText: text }).click()
   
-  // Wait for the active tab content to load
   const activeTab = page.locator('.tab-pane.active')
   await expect(activeTab.getByRole('link', { name: 'Contact Us' })).toBeVisible({ timeout: 10000 })
 })
