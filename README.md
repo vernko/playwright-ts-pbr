@@ -1,121 +1,198 @@
 # playwright-ts-pbr
-### Purpose
-The purpose of this project is to automate UI tests of the website, https://www.pbr.com/ using TypeScript & Playwright.
 
-##
-### FRAMEWORK INFORMATION
-This framework uses the following:
+## Purpose
+This project automates UI tests for [pbr.com](https://www.pbr.com/) using TypeScript and Playwright.
 
-#### Languages
-- Typescript
+## Prerequisites
+Before you begin, ensure you have:
+- Node.js (v18 or higher recommended)
+- npm or yarn package manager
+- Git
 
-#### Dependencies
+## Tech Stack
 
+**Language:** TypeScript
 
-#### Design Pattern
-- Page Object Model - if you haven't used the Page Object Model before, check out the Page Object Model section below.
+**Framework:** Playwright
 
-##
-### GETTING STARTED
-You will need the following on your computer in order to work on this project:
-* Playwright - [Playwright's Webpage](https://playwright.dev)
-* Typescript
+**Design Pattern:** Page Object Model (POM) - see [Understanding POM](#page-object-model) below
 
-1. Open the terminal
-2. Navigate to the directory you want to store this project
-3. Run this command ```git clone https://github.com/vernko/playwright-ts-pbr.git```
-4. Once it has cloned the repo, you should see something like ```pbr git:(main)```
-5. Now you now you have the code for the repo on your machine
-6. Open this project in the code editor of your choice(VS Code is a nice choice)
+## Getting Started
 
-##
-### NAMING CONVENTIONS
-- Functions - camelCase
-- Feature & Spec files - page.spec.ts (if it the page is multiple words use multiple_word_page.spec.ts)
+### Installation
 
-
-##
-### ORGANIZATION - PAGE OBJECTS
-#### Page Object Classes
-You'll find any Page Objects under the "tests" directory in the "pages" directory.
-
-Essentially, for each page you create a new class. You can use that class object anywhere in the automation.
-We use these classes to put any browser-related operations such as:
-- Locators
-- Clicks
-- Sending keys/inputs
-
-Add methods & locators related to that page inside this class.
-
-I prefer to organize these in a hybrid alphabetical/functionality order.
-- If there is no related functionality, order it alphabetically.
-- If there is related functionality, put that in order of occurrence.
-
-##
-### ORGANIZATION - TESTS
-You'll find any tests under the "tests/specs" directory. 
-- Each page is a separate spec file.
-- All tests are separate methods within the spec file. 
-
-##
-### CREATING TESTS
-Playwright comes with a test class already built in. You import that class, then have access to it.
-Just like with methods in a Page Object class, I organize these in a hybrid alphabetical/functionality order.
-- If there is no related functionality, order it alphabetically.
-- If there is related functionality, put that in order of occurrence.
-
-#### Test Structure
-- A descriptive name for the test
-- Test data/info needed for validation of tests
-- Clean descriptive steps (aka methods from page object class)
-- Assertion - whatever you are validating to ensure the test passes as you expect.
-
-#### Assert
-Playwright provides an "expect" class with a variety of asserts including:
-- toBeVisible
-- toBeTruthy
-- toContain
-
-#### Example of Creating a New Test
-If you need to create new tests related to a group of tests already created, go to that spec class/file, and add the new test there.
-
-If you need to create a test that does not relate to a current test. Add a new spec file for that particular page, then add the new test.
-
-For example, if you need to add a test for viewing a selected rider from a standings page. We might do something like this.
-1. Go to tests -> specs
-2. Create a ```standings.spec.ts``` file
-3. Create a ```test``` function, with a good description for the test
-4. Add test steps
-5. Verify you can view the rider you selected from the standings page
+1. Clone the repository:
+```bash
+   git clone https://github.com/vernko/playwright-ts-pbr.git
 ```
-test('a user can select a rider from the standings and view their page', async({ page }) => {
-# Go to a Standings page
-# Select a rider
-# Go to their page
-# Verify you can view their page
+   *Or fork the repository and clone your fork*
+
+2. Navigate to the project directory:
+```bash
+   cd playwright-ts-pbr
+```
+
+3. Install dependencies:
+```bash
+   npm install
+```
+
+4. Install Playwright browsers:
+```bash
+   npx playwright install
+```
+
+5. Open the project in your preferred code editor (VS Code recommended)
+
+## Project Structure
+```
+playwright-ts-pbr/
+├── tests/
+│   ├── helpers/        # Shared utility functions
+│   ├── pages/          # Page Object Models
+│   └── specs/          # Test specifications
+├── playwright.config.ts
+└── package.json
+```
+
+## Running Tests
+
+### Run All Tests
+```bash
+npx playwright test
+```
+
+### Run Tests for Specific Browser
+```bash
+npx playwright test --project=chromium
+npx playwright test --project=firefox
+npx playwright test --project=webkit
+```
+
+### Run Specific Test File
+```bash
+npx playwright test standings.spec.ts
+```
+
+### Run in Headed Mode
+```bash
+npx playwright test --headed
+```
+
+### Run in UI Mode
+```bash
+npx playwright test --ui
+```
+
+### Run from IDE
+1. Open the spec file containing your test
+2. Find the test function you want to run
+3. Click the play button next to the test
+
+For more command line options, see [Playwright's CLI documentation](https://playwright.dev/docs/test-cli).
+
+## Writing Tests
+
+### Naming Conventions
+- **Functions:** camelCase (e.g., `clickLoginButton`)
+- **Spec files:** `page_name.spec.ts` (e.g., `standings.spec.ts`, `mvp_race.spec.ts`)
+
+### Test Structure
+
+Each test should include:
+- **Descriptive name** - clearly states what is being tested
+- **Test data** - any data needed for validation
+- **Test steps** - clear, descriptive actions (using Page Object methods)
+- **Assertions** - validation that the test behaves as expected
+
+### Common Assertions
+
+Playwright provides various assertion methods including:
+- `toBeVisible()` - element is visible on the page
+- `toContain()` - text/array contains a value
+- `toBe()` - exact value match
+- `toHaveText()` - element has specific text
+
+### Creating a New Test
+
+**If the test relates to existing tests:**
+Add it to the existing spec file for that page.
+
+**If the test is for a new page or feature:**
+1. Navigate to `tests/specs`
+2. Create a new spec file: `page_name.spec.ts`
+3. Write your test using the structure above
+
+**Example:**
+```typescript
+test('a user can select a rider from the standings and view their page', async ({ page }) => {
+  // Navigate to standings page
+  await standingsPage.goto()
+  
+  // Select first rider
+  const riderName = await standingsPage.selectFirstRider()
+  
+  // Verify rider page displays
+  await expect(riderPage.heading).toHaveText(riderName)
 })
 ```
 
-##
-### RUNNING TESTS
-#### Individual Tests
-From IDE
-1. Go to the spec file of the test you want to run
-2. Find the test (aka test function) you want to run
-3. Click the play button next to the test
+## Page Object Model
 
-From Command Line
+### What is POM?
 
-- Check out playwright's docs for a good list of ways to run tests from the Command Line, [Run Tests from Command Line](https://playwright.dev/docs/test-cli)
+The Page Object Model is a design pattern that creates an object repository for web elements. Each page of the application has a corresponding Page Object class.
 
+### Organization
 
-##
-### ADDITIONAL RESOURCES
+Page Objects are located in `tests/pages/`. Each page gets its own class containing:
+- **Locators** - selectors for page elements
+- **Actions** - methods for interacting with the page (clicks, inputs, etc.)
 
-##
-#### Playwright
-Playwright has excellent documentation on their website, [Playwright's Webpage](https://playwright.dev). There are also some good courses available at Test Automation University's website, [TAU](https://testautomationu.applitools.com/learningpaths.html?id=playwright-path)
+### Method Organization
 
-##
-#### Page Object Model
-The article below from BrowserStack provides good info about the POM - [Article on POM](https://www.browserstack.com/guide/page-object-model-in-selenium)
+Methods are organized using a hybrid approach:
+- **No related functionality:** Alphabetical order
+- **Related functionality:** Order of occurrence/workflow
+
+For more details, see [BrowserStack's POM Guide](https://www.browserstack.com/guide/page-object-model-in-selenium).
+
+## Best Practices
+
+- ✅ Use descriptive test names that explain what is being tested
+- ✅ Keep tests independent - each test should run in isolation
+- ✅ Use proper waits - rely on Playwright's auto-waiting instead of hard timeouts
+- ✅ Add retries for genuinely flaky tests when needed
+- ✅ Keep Page Objects focused on a single page
+- ✅ Use helper functions for repeated logic
+
+## Troubleshooting
+
+**Tests timing out?**
+- Increase timeout in `playwright.config.ts`
+- Check if you're waiting for the right conditions
+
+**Flaky tests?**
+- Review retry configuration
+- Ensure proper waits are in place
+- Check for race conditions
+
+**Browser issues?**
+- Run `npx playwright install --force` to reinstall browsers
+- Ensure you're using compatible Node.js version
+
+## Additional Resources
+
+### Playwright Documentation
+- [Official Playwright Docs](https://playwright.dev)
+- [Test Automation University - Playwright Path](https://testautomationu.applitools.com/learningpaths.html?id=playwright-path)
+
+### Page Object Model
+- [BrowserStack POM Guide](https://www.browserstack.com/guide/page-object-model-in-selenium)
+
+## Contributing
+
+Contributions are welcome! Please ensure:
+- Tests follow the naming conventions
+- Code follows the project structure
+- All tests pass before submitting a PR

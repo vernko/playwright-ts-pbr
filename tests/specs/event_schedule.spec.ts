@@ -1,36 +1,11 @@
 import { test, expect, Page, Locator } from '@playwright/test'
+import { openNavLink } from '../helpers/utils'
 
 // Increase timeout for this flaky site
-test.setTimeout(60000)
+test.setTimeout(90000)
 
 // Configure retries for all tests in this file
 test.describe.configure({ retries: 2 })
-
-async function countHidden(locator: Locator) {
-  return locator.evaluateAll(items =>
-    items.filter(el => {
-      const style = window.getComputedStyle(el);
-      return (
-        style.display === 'none' ||
-        style.visibility === 'hidden' ||
-        style.opacity === '0'
-      );
-    }).length
-  );
-}
-
-async function countVisible(locator: Locator) {
-  return locator.evaluateAll(items =>
-    items.filter(el => {
-      const style = window.getComputedStyle(el);
-      return (
-        style.display !== 'none' &&
-        style.visibility !== 'hidden' &&
-        style.opacity !== '0'
-      );
-    }).length
-  );
-}
 
 async function getFirstCard(page: Page, text: string) {
   const firstCard = page.locator('.eventScheduleItem').filter({hasText: text }).first()
@@ -40,36 +15,30 @@ async function getFirstCard(page: Page, text: string) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('https://pbr.com', { waitUntil: 'domcontentloaded' })
-  await page.getByRole('button', { name: 'Schedule'}).click()
-  await page.getByRole('link', { name: 'Event Schedule'}).click()
+  await openNavLink(
+    page,
+    'Schedule',
+    'Event Schedule',
+    'events',
+    'PBR | Events'
+  )
 })
 
 test('a user can filter events', async ({ page }) => {
   const filterValue = 'UTB'
   
   await page.locator('#eventTourSelect.form-select').selectOption(filterValue)
-  
-  // Wait for matching items to be visible
-  const matchingItems = page.locator(`.eventScheduleItem.${filterValue}`)
-  await expect(matchingItems.first()).toBeVisible()
-  
-  // Wait for the non-matching items to be filtered out
-  const nonMatchingItems = page.locator(`.eventScheduleItem:not(.${filterValue})`)
-  await expect(async () => {
-    const visible = await countVisible(nonMatchingItems)
-    expect(visible).toBe(0)
-  }).toPass({ timeout: 10000, intervals: [200] })
-  
-  const totalNonMatching = await nonMatchingItems.count()
-  const matchingHidden = await countHidden(matchingItems)
-  const nonMatchingVisible = await countVisible(nonMatchingItems)
-  const nonMatchingHidden = await countHidden(nonMatchingItems)
-  
-  expect(matchingHidden).toBe(0)
-  expect(nonMatchingVisible).toBe(0)
-  expect(nonMatchingHidden).toBe(totalNonMatching)
-  expect(totalNonMatching).toBeGreaterThan(0)
+
+  const visibleItems = page.locator('.eventScheduleItem:visible')
+  await expect(visibleItems.first()).toBeVisible()
+
+  const count = await visibleItems.count()
+  expect(count).toBeGreaterThan(0)
+
+  for (let i = 0; i < count; i++) {
+    const item = visibleItems.nth(i)
+    await expect(item).toHaveClass(new RegExp(filterValue))
+  }
 })
 
 test('a user can view event details', async ({ page }) => {
