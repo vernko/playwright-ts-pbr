@@ -1,5 +1,28 @@
 import { Page, expect } from '@playwright/test';
 
+export async function clickAndWaitForPopup(
+  page: Page,
+  clickAction: Promise<unknown>,
+  timeout = 10_000
+) {
+  const [popup] = await Promise.all([
+    page.waitForEvent('popup', { timeout }),
+    clickAction
+  ])
+
+  await popup.waitForLoadState('domcontentloaded')
+  return popup
+}
+
+export function normalizeName(cardName: string) {
+    const normalizedCardName = cardName.split(/\s+/) // split on whitespace
+        .filter(Boolean)  // remove empty strings
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) // Proper-case
+        .join(' ');
+
+    return normalizedCardName;
+}
+
 export async function openNavLink(
     page: Page,
     button: string,
@@ -20,13 +43,4 @@ export async function openNavLink(
 
     await expect(page).toHaveURL(new RegExp(`/${newUrl}(\\?|/|$)`), { timeout: 15000 })
     await expect(page).toHaveTitle(title, { timeout: 15000 })
-}
-
-export function normalizeName(cardName: string) {
-    const normalizedCardName = cardName.split(/\s+/) // split on whitespace
-        .filter(Boolean)  // remove empty strings
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) // Proper-case
-        .join(' ');
-
-    return normalizedCardName;
 }
