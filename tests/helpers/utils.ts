@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page, expect, Locator } from '@playwright/test';
 
 export async function clickAndWaitForPopup(
   page: Page,
@@ -14,13 +14,14 @@ export async function clickAndWaitForPopup(
   return popup
 }
 
-export function normalizeName(cardName: string) {
-    const normalizedCardName = cardName.split(/\s+/) // split on whitespace
-        .filter(Boolean)  // remove empty strings
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) // Proper-case
-        .join(' ');
+export function normalizeName(cardName: string | null): string {
+  if (!cardName) return '';
 
-    return normalizedCardName;
+  return cardName
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
 }
 
 export async function openNavLink(
