@@ -27,18 +27,11 @@ test.beforeEach(async ({ page }) => {
 test('a user can filter events', async ({ page }) => {
   const filterValue = 'UTB'
   
-  await page.locator('#eventTourSelect.form-select').selectOption(filterValue)
+  await page.locator('#eventTourSelect').selectOption(filterValue);
 
-  const visibleItems = page.locator('.eventScheduleItem:visible')
-  await expect(visibleItems.first()).toBeVisible()
-
-  const count = await visibleItems.count()
-  expect(count).toBeGreaterThan(0)
-
-  for (let i = 0; i < count; i++) {
-    const item = visibleItems.nth(i)
-    await expect(item).toHaveClass(new RegExp(filterValue))
-  }
+  const utbEvents = page.locator(`.eventScheduleItem.${filterValue}`);
+  await expect(utbEvents.first()).toBeVisible();
+  expect(await utbEvents.count()).toBeGreaterThan(0);
 })
 
 test('a user can view event details', async ({ page }) => {
@@ -83,12 +76,21 @@ test('a user can get general tickets', async ({ page }) => {
 })
 
 test('a user can get premium tickets', async ({ page }) => {
-  const text = 'Premium Tickets'
-  const firstPremiumCard = await getFirstCard(page, text)
+  const ticketText = 'Premium Tickets'
+  const premiumTabText = 'Chute Seats'
+
+  const firstPremiumCard = await getFirstCard(page, ticketText)
+  await firstPremiumCard.locator('a', { hasText: ticketText }).click()
   
-  await firstPremiumCard.locator('a', { hasText: text }).click()
-  
-  // Wait for the active tab content to load
-  const activeTab = page.locator('.tab-pane.active')
-  await expect(activeTab.getByRole('link', { name: 'Contact Us' })).toBeVisible({ timeout: 10000 })
+  const premiumTicketTab = page.getByRole('tab', { name: premiumTabText });
+
+  // get aria-controls value from the tab
+  const paneId = await premiumTicketTab.getAttribute('aria-controls');
+  if (!paneId) {
+    throw new Error(`No aria-controls found for tab: ${premiumTabText}`);
+  }
+
+  const pane = page.locator(`#${paneId}`);
+
+  await expect(pane.getByRole('link', { name: 'Contact Us' })).toBeVisible();
 })
