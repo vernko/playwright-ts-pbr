@@ -76,12 +76,21 @@ test('a user can get general tickets', async ({ page }) => {
 })
 
 test('a user can get premium tickets', async ({ page }) => {
-  const text = 'Premium Tickets'
-  const firstPremiumCard = await getFirstCard(page, text)
+  const ticketText = 'Premium Tickets'
+  const premiumTabText = 'Chute Seats'
+
+  const firstPremiumCard = await getFirstCard(page, ticketText)
+  await firstPremiumCard.locator('a', { hasText: ticketText }).click()
   
-  await firstPremiumCard.locator('a', { hasText: text }).click()
-  
-  // Wait for the active tab content to load
-  const activeTab = page.locator('.tab-pane.active')
-  await expect(activeTab.getByRole('link', { name: 'Contact Us' })).toBeVisible({ timeout: 10000 })
+  const premiumTicketTab = page.getByRole('tab', { name: premiumTabText });
+
+  // get aria-controls value from the tab
+  const paneId = await premiumTicketTab.getAttribute('aria-controls');
+  if (!paneId) {
+    throw new Error(`No aria-controls found for tab: ${premiumTabText}`);
+  }
+
+  const pane = page.locator(`#${paneId}`);
+
+  await expect(pane.getByRole('link', { name: 'Contact Us' })).toBeVisible();
 })
