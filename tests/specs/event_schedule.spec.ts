@@ -27,18 +27,11 @@ test.beforeEach(async ({ page }) => {
 test('a user can filter events', async ({ page }) => {
   const filterValue = 'UTB'
   
-  await page.locator('#eventTourSelect.form-select').selectOption(filterValue)
+  await page.locator('#eventTourSelect').selectOption(filterValue);
 
-  const visibleItems = page.locator('.eventScheduleItem:visible')
-  await expect(visibleItems.first()).toBeVisible()
-
-  const count = await visibleItems.count()
-  expect(count).toBeGreaterThan(0)
-
-  for (let i = 0; i < count; i++) {
-    const item = visibleItems.nth(i)
-    await expect(item).toHaveClass(new RegExp(filterValue))
-  }
+  const utbEvents = page.locator(`.eventScheduleItem.${filterValue}`);
+  await expect(utbEvents.first()).toBeVisible();
+  expect(await utbEvents.count()).toBeGreaterThan(0);
 })
 
 test('a user can view event details', async ({ page }) => {

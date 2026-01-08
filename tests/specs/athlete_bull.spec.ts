@@ -4,8 +4,8 @@ import { openAthletesTab, openFirstBullProfile } from '../helpers/athletes';
 
 test('selecting a bull displays their page', async ({ page }) => {
     const firstBull = await openAthletesTab(page, 'Bulls');
-    const firstBullHeading = normalizeName(await firstBull.locator('h3').innerText());
-    await firstBull.click();
+    const firstBullHeading = normalizeName(await firstBull.locator('h3').first().innerText());
+    await firstBull.locator('.athleteBlock').first().click();
 
     await expect(page.locator('.athleteHead')).toBeVisible();
 
