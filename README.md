@@ -1,4 +1,4 @@
-# playwright-ts-pbr
+# Playwright Typescript - PBR UI Testing
 
 ## Purpose
 This project automates UI tests for [pbr.com](https://www.pbr.com/) using TypeScript and Playwright.
@@ -71,7 +71,7 @@ npx playwright test --project=webkit
 
 ### Run Specific Test File
 ```bash
-npx playwright test standings.spec.ts
+npx playwright test bull_standings.spec.ts
 ```
 
 ### Run in Headed Mode
