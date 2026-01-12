@@ -1,16 +1,14 @@
 import { test, expect, Page, Locator } from '@playwright/test'
 import { openNavLink } from '../helpers/utils'
 
-// Increase timeout for this flaky site
-test.setTimeout(90000)
+test.setTimeout(60000)
 
 // Configure retries for all tests in this file
 test.describe.configure({ retries: 2 })
 
 async function getFirstCard(page: Page, text: string) {
   const firstCard = page.locator('.eventScheduleItem').filter({hasText: text }).first()
-  await expect(firstCard).toBeVisible({ timeout: 15000 })
-  await firstCard.scrollIntoViewIfNeeded({ timeout: 10000 })
+  await expect(firstCard).toBeVisible({ timeout: 10000 })
   return firstCard;
 }
 
@@ -22,6 +20,8 @@ test.beforeEach(async ({ page }) => {
     'events',
     'PBR | Events'
   )
+
+  await page.locator('.eventScheduleItem').first().waitFor({ state: 'visible' })
 })
 
 test('a user can filter events', async ({ page }) => {
@@ -35,62 +35,51 @@ test('a user can filter events', async ({ page }) => {
 })
 
 test('a user can view event details', async ({ page }) => {
-  const text = 'Event Details';
-  const firstCard = await getFirstCard(page, text)
-  const eventTitle = await firstCard.locator('h2').textContent()
+  const firstCard = await getFirstCard(page, 'Event Details')
+  const eventTitle = (await firstCard.locator('h2').textContent())?.trim()
   
-  await firstCard.locator('a', { hasText: text }).click()
+  await firstCard.locator('a', { hasText: 'Event Details' }).click()
+  await page.waitForLoadState('domcontentloaded')
   
-  // Wait for the specific element with longer timeout
-  const eventPageHeading = page.locator('h2', { hasText: eventTitle || '' })
-  await expect(eventPageHeading).toBeVisible({ timeout: 10000 })
+  const eventPageHeading = page.locator('h2').first()
+  await expect(eventPageHeading).toBeVisible()
   
-  const eventPageHeadingText = await eventPageHeading.textContent()
+  const eventPageHeadingText = (await eventPageHeading.textContent())?.trim()
   expect(eventPageHeadingText).toBe(eventTitle)
 })
 
 test('a user can get general tickets', async ({ page }) => {
-  const text = 'General Tickets';
-  const firstCard = await getFirstCard(page, text);
-  
-  // Use force click since element might be covered
-  const [popup] = await Promise.all([
-    page.waitForEvent('popup', { timeout: 5000 }).catch(() => null),
-    firstCard.locator('a', { hasText: text }).click({ force: true })
-  ]);
+  const firstCard = await getFirstCard(page, 'General Tickets');
+  const ticketLink = firstCard.locator('a', { hasText: 'General Tickets' })
+
+    const [popup] = await Promise.all([
+    page.context().waitForEvent('page', { timeout: 5000 }).catch(() => null),
+    ticketLink.click()
+  ])
   
   // Check if popup opened or stayed on same page
   if (popup) {
     await popup.waitForLoadState('domcontentloaded')
-    const finalUrl = popup.url();
-    expect(finalUrl).toBeTruthy();
-    expect(finalUrl).not.toBe('about:blank');
+    expect(popup.url()).not.toBe('about:blank')
     await popup.close()
   } else {
-    // Navigation happened in same page
     await page.waitForLoadState('domcontentloaded')
-    const finalUrl = page.url();
-    expect(finalUrl).toBeTruthy();
-    expect(finalUrl).not.toBe('about:blank');
+    expect(page.url()).not.toBe(page.url()) // URL changed
   }
 })
 
 test('a user can get premium tickets', async ({ page }) => {
-  const ticketText = 'Premium Tickets'
-  const premiumTabText = 'Chute Seats'
-
-  const firstPremiumCard = await getFirstCard(page, ticketText)
-  await firstPremiumCard.locator('a', { hasText: ticketText }).click()
+  const firstPremiumCard = await getFirstCard(page, 'Premium Tickets')
+  await firstPremiumCard.locator('a', { hasText: 'Premium Tickets' }).click()
   
-  const premiumTicketTab = page.getByRole('tab', { name: premiumTabText });
+  const premiumTicketTab = page.getByRole('tab', { name: 'Chute Seats' });
 
   // get aria-controls value from the tab
   const paneId = await premiumTicketTab.getAttribute('aria-controls');
   if (!paneId) {
-    throw new Error(`No aria-controls found for tab: ${premiumTabText}`);
+    throw new Error(`No aria-controls found for Chute Seats tab`);
   }
 
   const pane = page.locator(`#${paneId}`);
-
   await expect(pane.getByRole('link', { name: 'Contact Us' })).toBeVisible();
 })
