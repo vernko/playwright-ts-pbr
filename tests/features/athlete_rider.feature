@@ -1,29 +1,33 @@
-Feature: Selecting
+Feature: Rider Athlete Profile
 
-Scenario: Selecting a rider displays their page
-    Given user is on the Rider pane of the Athlete's page
-    When the user selects a rider
-    Then they can view that rider's page
+    Scenario Outline: Viewing a rider's profile page
+        Given the user is on the Athlete's page riders section
+        When the user selects "<rider_name>"
+        Then the rider's profile page is displayed
+        And the page heading shows "<rider_name>"
 
-    Examples:
-    | Jose Vitor Leme | Kaique Pacheco
+        Examples:
+        | rider_name       |
+        | Jose Vitor Leme  |
+        | Kaique Pacheco   |
 
-Feature: Selecting a stat tab
+    Scenario Outline: Viewing rider statistics by tab
+        Given the user is on a rider's profile page
+        When the user selects the "<stat_tab>" tab
+        Then the "<stat_tab>" statistics are displayed
 
-Scenario: Selecting a stat displays the stats for that tab
-    Given user is on the Athlete's page
-    When the user selects a career or season stat tab
-    Then they can view that rider's stats
+        Examples:
+        | stat_tab |
+        | Career   |
+        | Season   |
 
-    Examples:
-    | Career | Season
+    Scenario Outline: Filtering season statistics by year
+        Given the user is on a rider's profile page
+        And the user has selected the "Season" tab
+        When the user selects year "<year>"
+        Then the statistics are updated to show "<year>" season data
 
-Feature: Season filter year tab
-
-Scenario: Selecting a year displays the stats for that tab
-    Given user has selected the season tab on the Athlete's page
-    When the user selects a year
-    Then the stats are updated to the stats for that year
-
-    Examples:
-    | 2024 | 2017
+        Examples:
+        | year |
+        | 2024 |
+        | 2017 |

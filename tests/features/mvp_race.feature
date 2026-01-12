@@ -1,9 +1,21 @@
-Feature: Filtering
+Feature: MVP Race Standings
 
-Scenario: Selecting a tab only displays standings related to the tab
-    Given user is on the MVP race page
-    When the user selects a tab
-    Then only standings related to that tab are displayed
+    Scenario Outline: Viewing MVP standings for a specific year
+        Given the user is on the MVP Race page
+        When the user selects year "<year>"
+        Then the MVP standings for "<year>" are displayed
 
-    Examples:
-    | Regular Season | Championship | 2024
+        Examples:
+        | year |
+        | 2024 |
+        | 2023 |
+    
+    Scenario Outline: Filtering MVP standings by season type
+        Given the user is on the MVP Race page
+        When the user selects the "<tab>" tab
+        Then only "<tab>" standings are displayed
+
+        Examples:
+        | tab              |
+        | Regular Season   |
+        | Championship     |

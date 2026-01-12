@@ -1,7 +1,11 @@
 import { expect, Page  } from '@playwright/test';
 
 export async function openAthletesTab(page: Page, tab: 'Bulls' | 'Riders') {
-  await page.goto('https://www.pbr.com/athletes');
+  await page.goto('https://www.pbr.com/athletes', { 
+    waitUntil: 'domcontentloaded',
+    timeout: 6000
+  });
+  
   const tabLink = page.getByRole('tab', { name: tab });
   await tabLink.click();
   return page.locator(`#${tab}`);

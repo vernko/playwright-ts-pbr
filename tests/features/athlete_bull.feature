@@ -1,19 +1,22 @@
-Feature: Selecting
+Feature: Bull Athlete Profile
 
-Scenario: Selecting a bull displays their page
-    Given user is on the bull pane of the Athlete's page
-    When the user selects a bull
-    Then they can view that bull's page
+    Scenario Outline: Viewing a bull's profile page
+        Given the user is on the Athlete's page bulls section
+        When the user selects "<bull_name>"
+        Then the bull's profile page is displayed
+        And the page heading shows "<bull_name>"
 
-    Examples:
-    | Man Hater | Buck Nasty
+        Examples:
+        | bull_name   |
+        | Man Hater   |
+        | Buck Nasty  |
 
-Feature: Selecting a stat tab
+    Scenario Outline: Viewing bull statistics by tab
+        Given the user is on a bull's profile page
+        When the user selects the "<stat_tab>" tab
+        Then the "<stat_tab>" statistics are displayed
 
-Scenario: Selecting a stat displays the stats for that tab
-    Given user is on the Athlete's page
-    When the user selects a event or rides stat tab
-    Then they can view that bull's stats
-
-    Examples:
-    | Event | Rides
+        Examples:
+        | stat_tab |
+        | Event    |
+        | Rides    |

@@ -1,19 +1,19 @@
-Feature: Navigation
+Feature: Team Information
 
-Scenario: User can view team's official site
-    Given a user is on the team page
-    When a user clicks on "View Official Site"
-    Then the user is taken to the official page for that team
+    Scenario Outline: Viewing team's official website
+        Given the user is on the "<team_name>" team page
+        When the user clicks "View Official Site"
+        Then a new page opens showing the team's official website
 
-    Examples:
-    | Arizona Ridge Riders |
+        Examples:
+        | team_name             |
+        | Arizona Ridge Riders  |
 
-Feature: Roster
+    Scenario Outline: Viewing team roster
+        Given the user is on the "<team_name>" team page
+        When the user views the roster section
+        Then the team's roster is displayed with rider names and photos
 
-Scenario: User can view team's roster
-    Given a user is on the team's page
-    When a user views the page
-    Then the user is able to view the team's roster
-
-    Examples:
-    | Arizona Ridge Riders |
+        Examples:
+        | team_name             |
+        | Arizona Ridge Riders  |

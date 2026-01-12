@@ -1,9 +1,21 @@
-Feature: Filtering
+Feature: Rookie of the Year Standings
 
-Scenario: Selecting a year only displays standings related to the tab
-    Given user is on the Rookie of the Year page
-    When the user selects a year
-    Then only standings related to that tab are displayed
+    Scenario Outline: Filtering rookie standings by year
+        Given the user is on the Rookie of the Year page
+        When the user selects year "<year>"
+        Then only standings for year "<year>" are displayed
+
+        Examples:
+        | year |
+        | 2020 |
+        | 2017 |
+
+    Scenario Outline: Viewing specific rookie riders' profiles
+    Given the user is on the Rookie of the Year page
+    When the user selects "<rider_name>" from the standings
+    Then the rider's profile page displays "<rider_name>"
 
     Examples:
-    | 2020 | 2017
+        | rider_name      |
+        | Jose Vitor Leme |
+        | Kaique Pacheco  |

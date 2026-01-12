@@ -1,20 +1,27 @@
-Feature: Events
+Feature: Results and Standings
 
-Scenario: User can navigate the results tab
-    Given a user is on the pbr home page
-    When they click on results tab
-    Then they can select a standing and view the page
+    Scenario Outline: Navigating to standings from results
+        Given the user is on the PBR home page
+        When the user clicks the "Results" tab
+        And the user selects "<standing_type>" standings
+        Then the "<standing_type>" standings page is displayed
 
-    Examples:
-    | MVP | Bull | Rookie of the year
+        Examples:
+        | standing_type       |
+        | MVP                 |
+        | Bull                |
+        | Rookie of the Year  |
 
-Feature: Events
+    Scenario Outline: Viewing standings from All Tour Standings page
+        Given the user is on the All Tour Standings page
+        When the user selects "<standing_type>" standings
+        Then the "<standing_type>" standings page is displayed
 
-Scenario: User can navigate the all tour standings page
-    Given a user is on the all tour standings page
-    When they click on a standing
-    Then they can view the page
-
-    Examples:
-    | PBR Teams | Unleash the Beast | Pendleton Velocity |
-    | MVP | Bull | Rookie of the year |
+        Examples:
+        | standing_type        |
+        | PBR Teams            |
+        | Unleash the Beast    |
+        | Pendleton Velocity   |
+        | MVP                  |
+        | Bull                 |
+        | Rookie of the Year   |
