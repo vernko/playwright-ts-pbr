@@ -21,15 +21,22 @@ test('when a user selects a year, the rookie standings display for that year', a
     await expect(table).toBeVisible()
 })
 
-test('a user can select a rider from the standings and view their page', async({ page }) => {
-    const table = page.locator('#standingsTable')
-    await table.scrollIntoViewIfNeeded()
-    const rowOneRider = table.locator('tbody tr').first().locator('td').nth(1).locator('a')
-    await expect(rowOneRider).toBeVisible()
-    const rowOneRiderText = (await rowOneRider.innerText()).trim()
-    await rowOneRider.click({ force: true })
-
-    await page.locator('.athlete-head').waitFor({ timeout: 30000 })
-    const riderName = await page.locator('.rider-name-custom').innerText()
-    expect(rowOneRiderText).toBe(normalizeName(riderName))
+test('a user can select a rider...', async ({ page }) => {
+  const table = page.locator('#standingsTable')
+  const rowOneRider = table.locator('tbody tr').first().locator('td').nth(1).locator('a')
+  
+  await expect(rowOneRider).toBeVisible()
+  const rowOneRiderText = (await rowOneRider.innerText()).trim()
+  
+  const [newPage] = await Promise.all([
+    page.context().waitForEvent('page', { timeout: 5000 }).catch(() => null),
+    rowOneRider.click()
+  ])
+  
+  const targetPage = newPage || page
+  await targetPage.locator('.athlete-head').waitFor({ timeout: 30000 })
+  const riderName = await targetPage.locator('.rider-name-custom').innerText()
+  expect(rowOneRiderText).toBe(normalizeName(riderName))
+  
+  if (newPage) await newPage.close()
 })

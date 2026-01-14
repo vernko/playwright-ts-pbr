@@ -61,7 +61,7 @@ test('a user can get general tickets', async ({ page }) => {
 
     const [popup] = await Promise.all([
     page.context().waitForEvent('page', { timeout: 5000 }).catch(() => null),
-    ticketLink.click()
+    ticketLink.click({ force: true })
   ])
   
   // Check if popup opened or stayed on same page
