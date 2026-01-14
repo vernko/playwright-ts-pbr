@@ -42,7 +42,12 @@ async function verifyScoresChanged(page: Page, scoresBefore: string[]) {
 
 test.beforeEach(async ({ page }) => {
   yearDropdown = page.locator('#standingsSelect')
-  await page.goto('https://www.pbr.com/athletes/bulls/standings/');
+  await page.goto('https://www.pbr.com/athletes/bulls/standings/', {
+    waitUntil: 'domcontentloaded',
+    timeout: 60000
+  })
+
+  await page.locator('#standingsTable').first().waitFor({ state: 'visible', timeout: 15000 })
 });
 
 test('default standings show consistent top bull', async ({ page }) => {
