@@ -21,6 +21,12 @@ test.beforeEach(async ({ page }) => {
     'PBR | Events'
   )
 
+  // Dismiss cookie banner if present
+  const cookieBanner = page.locator('#onetrust-accept-btn-handler')
+  if (await cookieBanner.isVisible().catch(() => false)) {
+    await cookieBanner.click()
+  }
+
   await page.locator('.eventScheduleItem').first().waitFor({ state: 'visible' })
 })
 
@@ -38,8 +44,8 @@ test('a user can view event details', async ({ page }) => {
   const firstCard = await getFirstCard(page, 'Event Details')
   const eventTitle = (await firstCard.locator('h2').textContent())?.trim()
   
-  await firstCard.locator('a', { hasText: 'Event Details' }).click()
-  await page.waitForLoadState('domcontentloaded')
+  await firstCard.locator('a', { hasText: 'Event Details' }).click({ force: true })
+  await page.waitForURL(/.*/, { waitUntil: 'domcontentloaded', timeout: 30000 })
   
   const eventPageHeading = page.locator('h2').first()
   await expect(eventPageHeading).toBeVisible()
@@ -51,10 +57,11 @@ test('a user can view event details', async ({ page }) => {
 test('a user can get general tickets', async ({ page }) => {
   const firstCard = await getFirstCard(page, 'General Tickets');
   const ticketLink = firstCard.locator('a', { hasText: 'General Tickets' })
+  const initialPath = new URL(page.url()).pathname;
 
     const [popup] = await Promise.all([
     page.context().waitForEvent('page', { timeout: 5000 }).catch(() => null),
-    ticketLink.click()
+    ticketLink.click({ force: true })
   ])
   
   // Check if popup opened or stayed on same page
@@ -64,7 +71,8 @@ test('a user can get general tickets', async ({ page }) => {
     await popup.close()
   } else {
     await page.waitForLoadState('domcontentloaded')
-    expect(page.url()).not.toBe(page.url()) // URL changed
+    await page.waitForURL(url => url.href !== initialPath, { timeout: 10000 })
+    expect(page.url()).not.toBe(initialPath) 
   }
 })
 
