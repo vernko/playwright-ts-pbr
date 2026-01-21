@@ -23,8 +23,10 @@ test.beforeEach(async ({ page }) => {
 
   // Dismiss cookie banner if present
   const cookieBanner = page.locator('#onetrust-accept-btn-handler')
-  if (await cookieBanner.isVisible().catch(() => false)) {
-    await cookieBanner.click()
+  const cookieBannerVisible = await cookieBanner.isVisible({ timeout: 2000 }).catch(() => false)
+  if (cookieBannerVisible) {
+    await cookieBanner.click({ timeout: 5000 }).catch(() => {})
+    await page.waitForTimeout(500)
   }
 
   await page.locator('.eventScheduleItem').first().waitFor({ state: 'visible' })
@@ -59,7 +61,7 @@ test('a user can get general tickets', async ({ page }) => {
   const ticketLink = firstCard.locator('a', { hasText: 'General Tickets' })
   const initialPath = new URL(page.url()).pathname;
 
-    const [popup] = await Promise.all([
+  const [popup] = await Promise.all([
     page.context().waitForEvent('page', { timeout: 5000 }).catch(() => null),
     ticketLink.click({ force: true })
   ])

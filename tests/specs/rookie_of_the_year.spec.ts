@@ -21,7 +21,7 @@ test('when a user selects a year, the rookie standings display for that year', a
     await expect(table).toBeVisible()
 })
 
-test('a user can select a rider...', async ({ page }) => {
+test('a user can select a rider from the standings and view their page', async ({ page }) => {
   const table = page.locator('#standingsTable')
   const rowOneRider = table.locator('tbody tr').first().locator('td').nth(1).locator('a')
   
