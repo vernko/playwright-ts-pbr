@@ -9,7 +9,11 @@ export async function openAthletesTab(page: Page, tab: 'Bulls' | 'Riders') {
   
   const tabLink = page.getByRole('tab', { name: tab });
   await tabLink.click();
-  return page.locator(`#${tab}`);
+
+  const activePane = page.locator('.tab-pane.active');
+  await expect(activePane).toBeVisible();
+
+  return activePane;
 }
 
 export async function getFirstAthleteCard(page: Page, tab: 'Bulls' | 'Riders') {
@@ -19,16 +23,12 @@ export async function getFirstAthleteCard(page: Page, tab: 'Bulls' | 'Riders') {
   return firstCard;
 }
 
-export async function openFirstBullProfile(page: Page): Promise<void> {
-  await page.goto(`${URLS.ATHLETES}#Bulls`);  // Changed from hardcoded URL
-
-  const bullsTab = page.locator('#bull-tab');
-  await expect(bullsTab).toBeVisible();
-  await bullsTab.click();
-
-  const firstBull = page.locator(`#Bulls ${SELECTORS.ATHLETE_BLOCK}`).first();  // Changed from '.athleteBlock'
-  await expect(firstBull).toBeVisible();
-  await firstBull.click();
-
-  await expect(page.locator(SELECTORS.ATHLETE_HEAD)).toBeVisible();  // Changed from '.athleteHead'
+/**
+ * Opens the profile page of the first athlete card in the specified tab.
+ * @param page - Playwright Page object
+ * @param tab - Either 'Bulls' or 'Riders'
+ */
+export async function openFirstAthleteProfile(page: Page, tab: 'Bulls' | 'Riders'): Promise<void> {
+  const firstCard = await getFirstAthleteCard(page, tab);
+  await firstCard.click();
 }

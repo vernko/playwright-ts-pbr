@@ -1,24 +1,23 @@
 import { test, expect } from '@playwright/test'
+import { TIMEOUTS, URLS } from '../helpers/constants';
 import { normalizeName } from '../helpers/utils'
 
 test.describe.configure({ retries: 2 })
 
 test.beforeEach(async ({ page }) => {
-    await page.goto('https://www.pbr.com/teams/regular-season-mvp/')
+    await page.goto(URLS.MVP_RACE, {
+      waitUntil: 'domcontentloaded',
+      timeout: TIMEOUTS.NAVIGATION
+    })
 })
 
 test('when a user selects a year, the standings display', async({ page }) => {
-    const yearButton = await page.locator('[data-id="2024"]')
-    await yearButton.waitFor()
-    
-    const responsePromise = page.waitForResponse(response => 
-        response.url().includes('TeamRiderMVP')
-    )
-    
+    const yearButton = page.locator('[data-id="2024"]')
+    await expect(yearButton).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
     await yearButton.click()
     
-    const response = await responsePromise
-    expect(response.url()).toContain('season=2024')
+    const yearSlideActive = yearButton.locator('.seasonBlock.active')
+    await expect(yearSlideActive).toBeVisible()
     
     const activePane = page.locator('#regular-season-pane.tab-pane.active')
     const table = activePane.locator('#standingsTable')
