@@ -1,11 +1,12 @@
 import { test, expect, Page, Locator } from '@playwright/test';
+import { TIMEOUTS, SELECTORS } from '../helpers/constants';
 import { normalizeName } from '../helpers/utils';
 
 let yearDropdown: Locator;
 
 export async function getTopBullScores(page: Page, count: number) {
-  await expect(page.locator('#standingsTable')).toBeVisible()
-  const scoreColumn = page.locator('#standingsTable tbody tr td:nth-child(3)')
+  await expect(page.locator(SELECTORS.STANDINGS_TABLE)).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
+  const scoreColumn = page.locator(`${SELECTORS.STANDINGS_TABLE} tbody tr td:nth-child(3)`)
   const allScores = await scoreColumn.allTextContents()
   return allScores.slice(0, count)
 }
@@ -18,6 +19,8 @@ export async function selectTour(page: Page, year: string, tourId: string) {
   
   await expect(tourLink).toBeVisible()
   await tourLink.click()
+
+  await page.locator(SELECTORS.STANDINGS_TABLE).waitFor({ state: 'visible', timeout: 10000 })
 }
 
 async function expectTopBullCardMatchesTable(page: Page) {
@@ -37,7 +40,7 @@ async function verifyScoresChanged(page: Page, scoresBefore: string[]) {
   await expect.poll(async () => {
     const scoresAfter = await getTopBullScores(page, 5)
     return scoresAfter.join('|')
-  }).not.toBe(scoresBefore.join('|'))
+  }, { timeout: 10000 }).not.toBe(scoresBefore.join('|'))
 }
 
 test.beforeEach(async ({ page }) => {

@@ -1,18 +1,24 @@
 import { test, expect, Page, Locator } from '@playwright/test';
+import { URLS, TIMEOUTS } from '../helpers/constants';
 import { normalizeName } from '../helpers/utils';
 
 let firstRider: Locator;
 
 async function clickSeasonTab(page: Page) {
-  const seasonTab = page.getByRole('tab', { name: 'SEASON' })
-  await seasonTab.waitFor({ state: 'visible', timeout: 15000 })
+  const seasonTab = page.locator('#season-tab')
+  await seasonTab.waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM })
   await seasonTab.click()
-  await expect(page.locator('#season-tab-pane')).toBeVisible()
+  await expect(page.locator('#season-tab-pane')).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
 }
 
 test.beforeEach(async ({ page }, testInfo) => {
-    await page.goto('https://www.pbr.com/athletes#Riders')
+    await page.goto(`${URLS.ATHLETES}#Riders`, {
+      waitUntil: 'domcontentloaded', // Add explicit wait strategy
+      timeout: TIMEOUTS.NAVIGATION
+    })
+
     firstRider = page.locator('.athleteBlock').first()
+    await expect(firstRider).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
 
     if (testInfo.title !== 'selecting a rider displays their page') {
         const firstRider = page.locator('.athleteBlock').first()

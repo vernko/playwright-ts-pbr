@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { normalizeName } from '../helpers/utils';
-import { openAthletesTab, openFirstBullProfile } from '../helpers/athletes';
+import { getFirstAthleteCard, openAthletesTab, openFirstBullProfile } from '../helpers/athletes';
 
 test('selecting a bull displays their page', async ({ page }) => {
-    const firstBull = await openAthletesTab(page, 'Bulls');
+    const firstBull = await getFirstAthleteCard(page, 'Bulls');
     const firstBullHeading = normalizeName(await firstBull.locator('h3').first().innerText());
-    await firstBull.locator('.athleteBlock').first().click();
+    await firstBull.first().click();
 
     await expect(page.locator('.athleteHead')).toBeVisible();
 
