@@ -1,9 +1,10 @@
 import { Page, expect, Locator } from '@playwright/test';
+import { BASE_URL, TIMEOUTS } from './constants';
 
 export async function clickAndWaitForPopup(
   page: Page,
   clickAction: Promise<unknown>,
-  timeout = 10_000
+  timeout = TIMEOUTS.MEDIUM
 ) {
   const [popup] = await Promise.all([
     page.waitForEvent('popup', { timeout }),
@@ -31,17 +32,16 @@ export async function openNavLink(
     newUrl: string,
     title: string
 ) {
-    const URL = 'https://pbr.com'
-    await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60000 })
+    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: TIMEOUTS.NAVIGATION })
 
     const navButton = page.getByRole('button', { name: button })
-    await expect(navButton).toBeVisible({ timeout: 15000 })
+    await expect(navButton).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
     await navButton.click()
 
     const navLink = page.getByRole('link', { name: link })
-    await expect(navLink).toBeVisible({ timeout: 15000 })
+    await expect(navLink).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
     await navLink.click()
 
-    await expect(page).toHaveURL(new RegExp(`/${newUrl}(\\?|/|$)`), { timeout: 15000 })
-    await expect(page).toHaveTitle(title, { timeout: 15000 })
+    await expect(page).toHaveURL(new RegExp(`/${newUrl}(\\?|/|$)`), { timeout: TIMEOUTS.MEDIUM })
+    await expect(page).toHaveTitle(title, { timeout: TIMEOUTS.MEDIUM })
 }
