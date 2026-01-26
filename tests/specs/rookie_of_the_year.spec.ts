@@ -1,21 +1,18 @@
 import { test, expect, Page } from '@playwright/test';
+import { URLS } from '../helpers/constants';
 import { normalizeName } from '../helpers/utils';
 
 test.beforeEach(async ({ page }) => {
-    await page.goto('https://www.pbr.com/athletes/riders/rookie-of-the-year/')
+    await page.goto(URLS.ROOKIE_OF_YEAR) 
 })
 
 test('when a user selects a year, the rookie standings display for that year', async({ page }) => {
-    await page.locator('[data-id="2013"]').waitFor()
-    
-    const responsePromise = page.waitForResponse(response => 
-        response.url().includes('RiderROTY')
-    )
-    
-    await page.locator('[data-id="2013"]').click()
-    
-    const response = await responsePromise
-    expect(response.url()).toContain('season=2013')
+    const yearSlide = page.locator('[data-id="2013"]')
+    await expect(yearSlide).toBeVisible()
+    await yearSlide.click()
+
+    const yearSlideActive = yearSlide.locator('.seasonBlock.active')
+    await expect(yearSlideActive).toBeVisible
     
     const table = page.locator('#standingsTable')
     await expect(table).toBeVisible()

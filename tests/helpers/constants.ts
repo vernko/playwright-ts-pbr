@@ -5,7 +5,7 @@ export const URLS = {
   ATHLETES: `${BASE_URL}/athletes`,
   ROOKIE_OF_YEAR: `${BASE_URL}/athletes/riders/rookie-of-the-year/`,
   BULL_STANDINGS: `${BASE_URL}/athletes/bulls/standings/`,
-  MVP_RACE: `${BASE_URL}/standings/teams/mvp-race/`,
+  MVP_RACE: `${BASE_URL}/teams/regular-season-mvp/`,
   EVENT_SCHEDULE: `${BASE_URL}/events`,
 } as const;
 
@@ -18,7 +18,8 @@ export const TIMEOUTS = {
 
 export const SELECTORS = {
   COOKIE_BANNER: '#onetrust-accept-btn-handler',
-  ATHLETE_HEAD: '.athleteHead',
+  BULL_ATHLETE_HEAD: '.athleteHead',
+  RIDER_ATHLETE_HEAD: '.athlete-head',
   ATHLETE_BLOCK: '.athleteBlock',
   STANDINGS_TABLE: '#standingsTable',
 } as const;
