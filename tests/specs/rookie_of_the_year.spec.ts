@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '../helpers/fixtures'
+import { Page, Locator } from '@playwright/test'
 import { URLS } from '../helpers/constants';
 import { normalizeName } from '../helpers/utils';
 

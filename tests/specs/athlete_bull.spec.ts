@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
-import { normalizeName } from '../helpers/utils';
+import { test, expect } from '../helpers/fixtures'
 import { getFirstAthleteCard, openFirstAthleteProfile } from '../helpers/athletes';
 import { SELECTORS } from '../helpers/constants';
+import { normalizeName } from '../helpers/utils';
 
 test('selecting a bull displays their page', async ({ page }) => {
     const firstBull = await getFirstAthleteCard(page, 'Bulls');
