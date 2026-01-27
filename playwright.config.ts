@@ -50,7 +50,7 @@ export default defineConfig({
         navigationTimeout: 90000,
       },
       timeout: 120000,
-      workers: process.env.CI ? 2 : 1,  // Firefox needs fewer
+      workers: 1,  // Firefox needs fewer
     },
     {
       name: 'webkit',
