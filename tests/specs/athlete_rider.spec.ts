@@ -1,7 +1,8 @@
-import { test, expect, Page, Locator } from '@playwright/test';
-import { SELECTORS, TIMEOUTS } from '../helpers/constants';
-import { normalizeName } from '../helpers/utils';
+import { test, expect } from '../helpers/fixtures'
+import { Page, Locator } from '@playwright/test'
 import { getFirstAthleteCard, openFirstAthleteProfile } from '../helpers/athletes';
+import { SELECTORS, TIMEOUTS } from '../helpers/constants'
+import { normalizeName } from '../helpers/utils';
 
 async function clickSeasonTab(page: Page) {
   const seasonTab = page.locator('#season-tab')

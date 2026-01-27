@@ -1,4 +1,5 @@
-import { test, expect, Page, Locator } from '@playwright/test'
+import { test, expect } from '../helpers/fixtures'
+import { Page, Locator } from '@playwright/test'
 import { openNavLink } from '../helpers/utils'
 
 test.setTimeout(60000)
@@ -20,14 +21,6 @@ test.beforeEach(async ({ page }) => {
     'events',
     'PBR | Events'
   )
-
-  // Dismiss cookie banner if present
-  const cookieBanner = page.locator('#onetrust-accept-btn-handler')
-  const cookieBannerVisible = await cookieBanner.isVisible({ timeout: 2000 }).catch(() => false)
-  if (cookieBannerVisible) {
-    await cookieBanner.click({ timeout: 5000 }).catch(() => {})
-    await page.waitForTimeout(500)
-  }
 
   await page.locator('.eventScheduleItem').first().waitFor({ state: 'visible' })
 })

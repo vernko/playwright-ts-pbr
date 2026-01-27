@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../helpers/fixtures'
 import { clickAndWaitForPopup, openNavLink } from '../helpers/utils'
 
 test.beforeEach(async ({ page }) => {
@@ -14,10 +14,7 @@ test.beforeEach(async ({ page }) => {
 test('user can view official team site', async ({ page }) => {
     const officialSiteLink = await page.getByRole('link', { name: 'Visit Official Site' })
 
-    const popup = await clickAndWaitForPopup(
-        page,
-        officialSiteLink.click()
-    )
+    const popup = await clickAndWaitForPopup(page, officialSiteLink.click())
 
     await expect(popup).toHaveURL(/arizonaridgeriders\.com/)
 })

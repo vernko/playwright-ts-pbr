@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../helpers/fixtures'
 import { TIMEOUTS, URLS } from '../helpers/constants';
 import { normalizeName } from '../helpers/utils'
 
@@ -17,25 +17,25 @@ test('when a user selects a year, the standings display', async({ page }) => {
     await yearButton.click()
     
     const yearSlideActive = yearButton.locator('.seasonBlock.active')
-    await expect(yearSlideActive).toBeVisible()
+    await expect(yearSlideActive).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
     
     const activePane = page.locator('#regular-season-pane.tab-pane.active')
     const table = activePane.locator('#standingsTable')
-    await expect(table).toBeVisible()
+    await expect(table).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
 })
 
 test('when a user selects the championship MVP tab, the standings display', async({ page }) => {
     await page.locator('#champion-tab').click()
     const activePane = page.locator('#championship-pane.tab-pane.active')
-    await expect(activePane).toBeVisible()
+    await expect(activePane).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
 
     const topCard = activePane.locator('.standingsTop3').first()
     const topCardName = (await topCard.locator('h3').nth(1).innerText()).trim()
 
-    const table = activePane.locator('#standingsTable');
+    const table = activePane.locator('#standingsTable')
     const rowOneRider = table.locator('tbody tr').first().locator('td').nth(2).locator('a')
-    await expect(rowOneRider).toBeVisible();
-    const rowOneRiderText = (await rowOneRider.innerText()).trim();
+    await expect(rowOneRider).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
+    const rowOneRiderText = (await rowOneRider.innerText()).trim()
 
-    expect(rowOneRiderText).toBe(normalizeName(topCardName));
+    expect(rowOneRiderText).toBe(normalizeName(topCardName))
 })

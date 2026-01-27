@@ -1,5 +1,6 @@
-import { test, expect, Page } from '@playwright/test';
-import { TIMEOUTS, URLS } from '../helpers/constants';
+import { test, expect } from '../helpers/fixtures'
+import { Page, Locator } from '@playwright/test'
+import { TIMEOUTS, URLS } from '../helpers/constants'
 
 /**
  * Opens a results page from the Results dropdown
@@ -18,7 +19,12 @@ async function openResultsPage(
   }
 ) {
   const resultsDropdown = page.locator('.dropdown-menu.dropdown-menu-end.show')
-  await resultsDropdown.getByRole('link', { name: dropDownValue }).click()
+  await resultsDropdown.waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM })
+  await page.waitForTimeout(500)
+
+  const item = resultsDropdown.locator(`a:has-text("${dropDownValue}")`)
+  await expect(item).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
+  await item.click()
 
   // If we need to click a card (All Around scenario)
   if (options?.cardTitle) {
@@ -50,8 +56,19 @@ async function verifyStandingResultsDisplay(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
-    await page.goto(URLS.HOME)
-    await page.getByRole('button', { name: 'Results' }).click()
+    await page.goto(URLS.HOME, {
+      waitUntil: 'domcontentloaded',
+      timeout: TIMEOUTS.NAVIGATION
+    })
+
+    const resultsButton = page.getByRole('button', { name: 'Results' })
+    await expect(resultsButton).toBeVisible({ timeout: TIMEOUTS.MEDIUM })
+    await resultsButton.click()
+
+    await page.locator('.dropdown-menu.dropdown-menu-end.show').waitFor({ 
+      state: 'visible', 
+      timeout: TIMEOUTS.MEDIUM 
+    })
 })
 
 test('a user can view standings', async ({ page }) => {
